@@ -1,7 +1,6 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(name='test_sim',
       version='1.0',
-      package_dir={'': 'test_sim'},
-       packages=find_packages(where='test_sim'),
+      packages=['test_sim', ],
       )
