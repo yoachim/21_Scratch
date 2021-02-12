@@ -16,17 +16,15 @@ def load_and_run():
     opsimdb = db.OpsimDatabase(dbFile)
     runName = dbFile.replace('.db', '')
 
-    nside = 4
+    nside = 64
     slicer = slicers.HealpixSlicer(nside=nside)
 
-    templateDir = '/Users/yoachim/git_repos/sims_maf_contrib/data/SNe_data'
-    pixArea = hp.nside2pixarea(nside, degrees=True)
-    metric = SNNSNMetric(season=[-1], verbose=False, templateDir=templateDir, pixArea=pixArea)  #, zlim_coeff=0.98)
+    metric = SNNSNMetric(verbose=False)  #, zlim_coeff=0.98)
 
     bundleList = []
 
-    sql = ''
-    #sql = '(note = "%s")' %('DD:COSMOS')
+    #sql = ''
+    sql = '(note = "%s")' %('DD:COSMOS')
 
     bundleList.append(metricBundles.MetricBundle(metric, slicer, sql, runName=runName))
 
@@ -35,7 +33,7 @@ def load_and_run():
     bundleDict = metricBundles.makeBundlesDictFromList(bundleList)
     bgroup = metricBundles.MetricBundleGroup(bundleDict, opsimdb, outDir=outDir, resultsDb=resultsDb)
     bgroup.runAll()
-    #bgroup.plotAll(closefigs=False)
+    bgroup.plotAll()
 
 
 if __name__ == '__main__':
