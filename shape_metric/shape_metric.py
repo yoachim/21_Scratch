@@ -1,41 +1,8 @@
 import numpy as np
 import healpy as hp
 import lsst.sims.maf.metrics as metrics
-
-from lsst.sims.photUtils import Sed, Bandpass
-
-
-class Phot_properties(object):
-    """Object to hold handy values mostly calculated in sys-eng throughputs
-    """
-    def __init__(self, R_v=3.1):
-        # Calculate dust extinction values
-        waveMins = {'u': 330., 'g': 403., 'r': 552., 'i': 691., 'z': 818., 'y': 950.}
-        waveMaxes = {'u': 403., 'g': 552., 'r': 691., 'i': 818., 'z': 922., 'y': 1070.}
-        self.Ax1 = {}
-        for filtername in waveMins:
-            wavelen_min = waveMins[filtername]
-            wavelen_max = waveMaxes[filtername]
-            testsed = Sed()
-            testsed.setFlatSED(wavelen_min=wavelen_min, wavelen_max=wavelen_max, wavelen_step=1.0)
-            testbandpass = Bandpass(wavelen_min=wavelen_min, wavelen_max=wavelen_max, wavelen_step=1.0)
-            testbandpass.setBandpass(wavelen=testsed.wavelen,
-                                     sb=np.ones(len(testsed.wavelen)))
-            self.ref_ebv = 1.0
-            # Calculate non-dust-extincted magnitude
-            flatmag = testsed.calcMag(testbandpass)
-            # Add dust
-            a, b = testsed.setupCCM_ab()
-            testsed.addDust(a, b, ebv=self.ref_ebv, R_v=R_v)
-            # Calculate difference due to dust when EBV=1.0 (m_dust = m_nodust - Ax, Ax > 0)
-            self.Ax1[filtername] = testsed.calcMag(testbandpass) - flatmag
-
-        # Telescope zeropoint for 30s exposure
-        self.zp = {'u': 27.03, 'g': 28.38, 'r': 28.15, 'i': 27.86, 'z': 27.46, 'y': 26.68}
-        # Atmospheric extinction coefficents
-        self.kAtm = {'u': 0.502, 'g': 0.214, 'r': 0.126, 'i': 0.096, 'z': 0.069, 'y': 0.169}
-        self.exptime = 30.
-        self.pixscale = 0.2
+from lsst.sims.photUtils import Dust_values
+from lsst.sims.utils import SysEngVals
 
 
 class Size_precision_metric(metrics.BaseMetric):
@@ -50,10 +17,11 @@ class Size_precision_metric(metrics.BaseMetric):
     mu_0_object : dict-like
         Dictionary with keys of filternames and values of the central surface brightness of an object in
         mags/sq arcsec
-    phot_parameters : object (None)
+    dust_properties : object (None)
         An object with properties of the telescope (like photometric zeropoints in each filter). Default of None will
-        load values from sims_utils.
-
+        load values from sims_photUtils.
+    pixscale : float (0.2)
+        The camera pixelscale (default 0.2 arsec/pix).\
     stellar_density_limit : float (None)
         XXX--to add, put in a limit where if the stellar density is too high, returns weight of 0.
 
@@ -66,7 +34,8 @@ class Size_precision_metric(metrics.BaseMetric):
                  m5Col='fiveSigmaDepth', exptimeCol='visitExposureTime',
                  skyCol='skyBrightness', airmassCol='airmass',
                  maps=['StellarDensityMap', 'DustMap'],
-                 return_weights=False, phot_parameters=None, **kwargs):
+                 return_weights=False, dust_properties=None, pixscale=0.2,
+                 phot_parameters=None, **kwargs):
         self.seeingCol = seeingCol
         self.m5Col = m5Col
         self.fwhm_object = fwhm_object
@@ -80,11 +49,18 @@ class Size_precision_metric(metrics.BaseMetric):
         self.cols = [seeingCol, m5Col, filterCol, exptimeCol, skyCol, airmassCol]
         self.maps = maps
         units = 'SNR'
+        self.pixscale = pixscale
         super().__init__(col=self.cols, maps=self.maps, units=units, metricName=metricName, **kwargs)
-        if phot_parameters is None:
-            self.phot_parameters = Phot_properties()
+        if dust_properties is None:
+            dust_properties = Dust_values()
+            self.Ax1 = dust_properties.Ax1
         else:
-            self.phot_parameters = phot_parameters
+            dust_properties = dust_properties
+            self.Ax1 = dust_properties.Ax1
+
+        if phot_parameters is None:
+            self.phot_parameters = SysEngVals()
+
         # XXX--could declare a stellar density limit and mask out healpixels where things get too crowded
 
     def run(self, dataSlice, slicePoint=None):
@@ -99,7 +75,7 @@ class Size_precision_metric(metrics.BaseMetric):
         for filtername in self.mu_0_object:
             in_filt = np.where(dataSlice[self.filterCol] == filtername)
             #  Apply dust extinction to the peak flux
-            A_x = self.phot_parameters.Ax1[filtername] * slicePoint['ebv']
+            A_x = self.Ax1[filtername] * slicePoint['ebv']
             mu_0 = self.mu_0_object[filtername] + A_x
             # Scale mu_0 by exposure time
             mu_0 += 1.25*np.log(dataSlice[self.exptimeCol][in_filt]/self.phot_parameters.exptime)
@@ -108,24 +84,24 @@ class Size_precision_metric(metrics.BaseMetric):
             # XXX--apply seeing correction to peak fluxes
 
             # convert central surface brightness to counts
-            peak_counts_sqdeg = 10.**(0.4*(self.phot_parameters.zp[filtername] - mu_0))
-            peak_counts[in_filt] = peak_counts_sqdeg * self.phot_parameters.pixscale**2
+            peak_counts_sqdeg = 10.**(0.4*(self.phot_parameters.Zp_t[filtername] - mu_0))
+            peak_counts[in_filt] = peak_counts_sqdeg * self.pixscale**2
             # Convert sky brightness to counts
-            sky_counts_sqdeg = 10.**(0.4*(self.phot_parameters.zp[filtername] - dataSlice[self.skyCol][in_filt]))
-            sky_counts = sky_counts_sqdeg * self.phot_parameters.pixscale**2
+            sky_counts_sqdeg = 10.**(0.4*(self.phot_parameters.Zp_t[filtername] - dataSlice[self.skyCol][in_filt]))
+            sky_counts = sky_counts_sqdeg * self.pixscale**2
             # Assuming sky or source dominating the noise. XXX--do I need a gain term in here maybe?
             noise_at_peak[in_filt] = (sky_counts + peak_counts[in_filt])**0.5
 
             # compute the uncertainty in the shape of a psf from a star on the image. Not
             # going to bother with dust and airamss on this, just assume you could use a brighter star.
-            sigma_fwhm_refstar[in_filt] = 1.4*star_fwhm[in_filt]*(self.phot_parameters.pixscale/star_fwhm[in_filt])**0.5*noise_at_peak[in_filt]/self.stellar_ref_peak[filtername]
+            sigma_fwhm_refstar[in_filt] = 1.4*star_fwhm[in_filt]*(self.pixscale/star_fwhm[in_filt])**0.5*noise_at_peak[in_filt]/self.stellar_ref_peak[filtername]
 
         # Let's use the simple equation from: http://articles.adsabs.harvard.edu//full/1992PASP..104.1104L/0001105.000.html
         # to say what the uncertainty in the shape we measure is.
         # the observed FWHM is convolved with the seeing.
         fwhm_observed = np.sqrt(self.fwhm_object**2 + dataSlice[self.seeingCol]**2)
         # uncertainty in the observed object size
-        sigma_fwhm_object_predeconv = 1.4*fwhm_observed*(self.phot_parameters.pixscale/fwhm_observed)**0.5*noise_at_peak/peak_counts
+        sigma_fwhm_object_predeconv = 1.4*fwhm_observed*(self.pixscale/fwhm_observed)**0.5*noise_at_peak/peak_counts
 
         # Uncertainty in reference star PSF can dominate
         sigma_fwhm_object = (sigma_fwhm_object_predeconv**2 + sigma_fwhm_refstar**2)**0.5
