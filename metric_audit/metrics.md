@@ -35,11 +35,16 @@ Breaking these out because the solar system metrics are more computationally int
 Population completeness for:
 
 * Near Earth Asteroids (NEO)
+* Potentially hazerdous Asteroids (PHA)
 * Main Belt Asteroids (MBA)
-* TNOs (XXX--list default H mags used for each pop)
-* etc
+* TNOs
+* Trojans
+* Oort
+* Have something called SDO that's been commented out.
 
-Lots of additional solar system metrics run, but we'll leave it to the science collab to investigate in detail. 
+Should double check which brightnesses are most interesting. (Right now doing differential completeness 3 pairs in 15 nights)
+
+XXX--any populations to add? 
 
 
 <!---
@@ -139,6 +144,11 @@ A metric that can be used to get the total number of stars:  https://github.com/
 
 Currently runs in only a single filter, so a very limited metric, probably should not be promoted in current state
 
+### Number of galaxies metric ###
+
+Probably should cut because this is also single filter.
+
+
 ### Time Delay Metric ###
 
 LJ and others:  https://github.com/lsst/sims_maf/blob/master/python/lsst/sims/maf/metrics/seasonMetrics.py
@@ -156,9 +166,23 @@ From Keaton Bell:  https://github.com/LSST-nonproject/sims_maf_contrib/blob/mast
 Status:  Looks pretty good and like it fell through the cracks earlier.
 
 
-### Number of galaxies metric ###
+### Star Forming Regions ###
 
-Probably should cut because this is also single filter.
+Being worked on by Sara Bonito et al
+
+
+### Updated 3x2 figure of merit emulator ###
+
+By Husni Almoubayyed in sims_maf_contrib. Does this need to get merged still?
+
+### Crowding Metric ###
+
+Probably a good metric that can be used as a base for other metrics, but not to helpful in itself? There were some questions about it, but it looks like things might be OK.
+
+
+### DDF metrics ###
+
+I have code somewhere to define a circle of points around a DDF. Can run the SNe Ia on it. What else? Something from AGN?
 
 
 <!---
