@@ -21,7 +21,7 @@ Note, this follows the letter of the SRD, but can fail for footprints designed t
 
 ### Parallax and Proper Motion ###
 
-XXX--should look up the SRD requirements
+XXX--should look up the SRD requirements, maybe make an explicit summary stat so we can see how close to SRD we get like with fO
 
 ### Rapid Revisit  ###
 
@@ -40,11 +40,11 @@ Population completeness for:
 * TNOs
 * Trojans
 * Oort
-* Have something called SDO that's been commented out.
+* Have something called SDO that's been commented out?
+* Sounds like maybe add comets
 
 Should double check which brightnesses are most interesting. (Right now doing differential completeness 3 pairs in 15 nights)
 
-XXX--any populations to add? 
 
 
 <!---
@@ -62,7 +62,7 @@ Status:  Looks good, gives results consistent with earlier published calcs. Just
 
 ### Galaxy Shape Precision ###
 
-PY working with Husni and Rachel Mandelbaum. Started in https://github.com/yoachim/21_Scratch/tree/main/shape_metric
+PY working with Husni Almoubayyed and Rachel Mandelbaum. Started in https://github.com/yoachim/21_Scratch/tree/main/shape_metric
 
 Status:  Actively working on defining how to best use SNR weighting.
 
@@ -105,6 +105,8 @@ Need to double check, then should be ready to promote to regular.
 Michael Coughlin et al also might have made a quick KNe metric:  https://github.com/mcoughlin/sims_maf_contrib/tree/KNe
 
 Great! We can run them both, make sure they are consistent, then pick one to run on the regular.
+
+Maybe also have one based on plasticc light curves?
 
 
 ### Photometric Redshift ###
@@ -170,6 +172,16 @@ Status:  Looks pretty good and like it fell through the cracks earlier.
 
 Being worked on by Sara Bonito et al
 
+Also with Loredana Prisinzano.  Hacked up a start at:  https://github.com/yoachim/21_Scratch/blob/main/star_forming_vol/star_forming_volume.ipynb
+
+I think we need a 3-D model of star forming regions and dust to make this work all the way.
+
+
+### Blazar Metric ###
+
+Talked with Claudia Maria Raiteri. Sounds like the TDE metric is a good start for them. 
+
+
 
 ### Updated 3x2 figure of merit emulator ###
 
@@ -177,12 +189,13 @@ By Husni Almoubayyed in sims_maf_contrib. Does this need to get merged still?
 
 ### Crowding Metric ###
 
-Probably a good metric that can be used as a base for other metrics, but not to helpful in itself? There were some questions about it, but it looks like things might be OK.
+Probably a good metric that can be used as a base for other metrics, but not to helpful in itself? There were some questions about it being consistent with DES data, but it looks like things might be OK.
 
 
 ### DDF metrics ###
 
-I have code somewhere to define a circle of points around a DDF. Can run the SNe Ia on it. What else? Something from AGN?
+We are currently running the plasticc SNe Ia on the DDFs.  What else? Something from AGN?
+Should clean up the code a tiny bit to consolidate the euclid fields maybe. Should probably do a set where we turn the focal plane on to test the different dithering strategies.
 
 
 <!---
