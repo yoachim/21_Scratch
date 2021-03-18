@@ -102,7 +102,7 @@ Have a metric from Christian Setzer:  https://github.com/LSST-nonproject/sims_ma
 
 Need to double check, then should be ready to promote to regular.
 
-Michael Coughlin et al also might have made a quick KNe metric:  https://github.com/mcoughlin/sims_maf_contrib/tree/KNe
+Michael Coughlin et al have made a quick KNe metric: https://github.com/LSST-nonproject/sims_maf_contrib/blob/master/science/Transients/KNeSlicer.ipynb
 
 Great! We can run them both, make sure they are consistent, then pick one to run on the regular.
 
