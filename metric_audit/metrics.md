@@ -176,16 +176,18 @@ Also with Loredana Prisinzano.  Hacked up a start at:  https://github.com/yoachi
 
 I think we need a 3-D model of star forming regions and dust to make this work all the way.
 
+Made some progress. May want to also add confusion uncertainties.
+
 
 ### Blazar Metric ###
 
-Talked with Claudia Maria Raiteri. Sounds like the TDE metric is a good start for them. 
+Talked with Claudia Maria Raiteri. Sounds like the TDE metric is a good start for them.  Helped them get started:  https://github.com/yoachim/21_Scratch/blob/main/blazar_metric/blazar_saturation_metric.ipynb
 
 
 
 ### Updated 3x2 figure of merit emulator ###
 
-By Husni Almoubayyed in sims_maf_contrib. Does this need to get merged still?
+By Husni Almoubayyed in sims_maf_contrib. Does this need to get merged still?--ok, looks like it got merged. 
 
 ### Crowding Metric ###
 
@@ -195,7 +197,7 @@ Probably a good metric that can be used as a base for other metrics, but not to 
 ### DDF metrics ###
 
 We are currently running the plasticc SNe Ia on the DDFs.  What else? Something from AGN?
-Should clean up the code a tiny bit to consolidate the euclid fields maybe. Should probably do a set where we turn the focal plane on to test the different dithering strategies.
+Should clean up the code a tiny bit to consolidate the euclid fields maybe. Should probably do a set where we turn the focal plane on to test the different dithering strategies. Updated the example notebook in sims_maf_contrib tutorials.
 
 
 <!---
