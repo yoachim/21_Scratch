@@ -213,14 +213,14 @@ Here are some metrics that we have, but are not necissarily running on all new s
 
 Described in this AAS Research Note:  https://iopscience.iop.org/article/10.3847/2515-5172/abd6e2
 
-The general conclusion is that while we can alter the survey strategy to increase the SNR on DCR measurments, the gain is not particularly impressive.
+The general conclusion is that while we can alter the survey strategy to increase the SNR on DCR measurments, the gain is not particularly impressive. Should confirm this with the latest cadence notes.
 
 
 ### Spatial Dithering ###
 
 Lots of earlier work from Humna Awan (https://ui.adsabs.harvard.edu/abs/2016ApJ...829...50A/abstract). 
 
-I think we have concluded that our default spatial dithering scheme is adequate and should not artificially create power around 1 degree scales.
+I think we have concluded that our default spatial dithering scheme is adequate and should not artificially create power around 1 degree scales. 
 
 
 ### Follow up Observatories ###
