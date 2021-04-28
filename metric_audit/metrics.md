@@ -89,7 +89,7 @@ Status:  Should double check that the output is reasonable. Just added dust exti
 
 ### AGN metric ###
 
-Pretty sure AGN group is working on something.
+Should try to get Yu et al metric on structure function for AGN. Looks like a handy metric we would want to run.
 
 ### Novel Discovery Metric ###
 
@@ -226,5 +226,29 @@ I think we have concluded that our default spatial dithering scheme is adequate 
 ### Follow up Observatories ###
 
 I like this one. No need to run it on everything, but a good reminder that we should make sure the alert stream is spread over a large range of declinations to spread out the follow-up load.
+
+
+
+
+# Simulations to run as v2.0
+
+Here are a list of simulations we should consider running as part of 2.0 to help finalize the survey strategy
+
+## Baseline 2.0
+
+A new baseline survey with new changes of
+
+* Pairs in twilight
+* New footprint?
+
+maybe also a run with the old footprint, and the old footprint/old style.
+
+
+## Rolling
+
+Could try rolling for both WFD and DDFs. 
+
+
+## DDFs
 
 
