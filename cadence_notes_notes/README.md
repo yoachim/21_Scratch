@@ -41,6 +41,10 @@ Carlin et al: Resolved census of dwarf satellites around Local Volume galaxies: 
 
 Blaineau et al:  Microlensing towards MCs.  Sounds like they want very long baseline coverage of LMC/SMC. We could make a metric for this I suppose--very long timescale variables. 
 
+Graham et al:  SNe. Lots of text. Claims they like rolling cadence. Not sure there's much in here that matters.
+
+
+
 
 ## Metrics we should try to get
 
