@@ -6,26 +6,47 @@ Here's a list of metrics
 ----------------  Things we run standard ----------------
 -->
 
-## Standard Metrics ##
 
-### fO metric ###
+## Science Metrics being run currently ##
 
-For checking the area where we reach 825 visits over all filters.
+ExgalM5_with_cuts : This is a DESC metric that looks at the coadded depth in i-band for unextincted area in years 1, 3, 6, and 10. I'm not a huge fan of this one since the dust cut is a magic number, but DESC like it. This outputs a 3x2pt FoM and Effective Area summary stats. Since this is i-band only, should not be used when trying to determine filter distributions on survey footprint!
 
-Can be interpreted as how much contingency we have remaining at the end of the survey (if it is at 1.0, we have spent all the contingency)
+DepthLimitedNumGalaxies : A DESC LSS metric. Returns the number of galaxies in i-band for unextincted area. Again, should not be used when trying to determine filter distributions on survey footprint!
 
-XXX--I think we've adopted fONv median number of visits.
+WeakLensingNvisits : DESC WL metric. should not be used when trying to determine filter distributions on survey footprint!
 
-Note, this follows the letter of the SRD, but can fail for footprints designed to circumvent it (e.g., exploiting the fact there is a median to go deeper on part of the sky and shallow on another). Presumably, some science cases that desire survey uniformity would catch this.
+SNIa : The fraction of injected SNe that meet various detection criteria. Should replace with the DESC SNe metric that comptues number of SNe and mean redshift. Note the DESC metric is a bit more computationally intensive, so we should veryify that it is accurate enough at low resolution, or plan to run on it's own (like Solar System metrics). Maybe need to add dust extinction to DESC metric as well.
+
+Kuiper rotSkyPos and rotTelPos : Used to check that camera rotator angle is uniform. Not the most useful, but a good Q/A check to make sure things haven't changed wrt rotational dithering I suppose. Should probably be replaced with my simple systematics metric:  https://github.com/yoachim/21_Scratch/tree/main/shape_metric
 
 
-### Parallax and Proper Motion ###
+DDF SNe : Same as SNIa above, but run on each DDF. Again, should probably replace with DESC SNIa metric. 
 
-XXX--should look up the SRD requirements, maybe make an explicit summary stat so we can see how close to SRD we get like with fO
+DDF median depth : Median depth in each filter in each DDF.
 
-### Rapid Revisit  ###
+GalaxyCounts : Number of galaxies in i-band. Should not be used when trying to determine filter distributions on survey footprint!
 
-XXX--Do we meet the rapid revisit requirements.
+Nstars : Number of MW stars predicted in each filter, with and without crowding corrections. Probably not useful for SCOC. Might be kinda useful for DM, but once we've run it once, not sure we need to continue running it.
+
+FO metrics:  Related to the SRD, checking what area reaches 825 visits, and the median number of visits in the top 18,000 square degrees. The 
+
+SRD parallax and proper motion : Not sure why we have the regular and the normalized in here. And why are the parallax and proper motion magnitudes different (22.4 & 24.0 vs 20.5 & 24)? Not sure we need parallax coverage metric in here. Need to add what is critical value for parallaz-DCR degeneracy to caption. Should also add SRD critical values to the captions.
+
+NumberOfQuickRevisits : How useful is this one? I guess if the RapidRevisit is failing below, this one is ilustrative as to why. Is it actually in the SRD? Need to update caption, we don't have proposals.
+
+RapidRevisits : Shows area on the sky that meets the rapid revisit requirement.  
+
+YearCoverage : shows, per filter, how many unique years points on the sky are observed. Relevant for image differencing tempalte generation. Probably not a true "science" metric.
+
+
+KN_* metrics:  Uses a lightcurve from PLASTICC challenge to check various detection criteria. I think this one has an update from the community we should probably adopt. Would also be good to check that the number of events we are simulating is adequate (only 17% are detected at all, so the relative metric value can jump around a lot while the absolute number of events changes little).
+
+
+Microlesning : Metric from the community looking at fast and slow microlensing events. Slow microlensing seems pretty uninformative (we always find the slow ones). Fast microlensing gives a strong arguemnt for bulge and MC coverage. Might be updates from the community.
+
+PeriodDetection : Metric for how well we recover periods of stars. This metric is a little suspect at the moment (a scipy update changed it's behaviour and I don't understand why). I would hope we could replace this some more sophisticated metrics from the community, e.g., the volume we can measure RR Lyrae periods to. 
+
+TDE : Metric from the community simulating TDE events. Similar to KN metric, we may need to increase the sample size of simulated events to lower shot noise. 
 
 
 ### Solar System Metrics ###
@@ -43,7 +64,7 @@ Population completeness for:
 * Have something called SDO that's been commented out?
 * Sounds like maybe add comets
 
-Should double check which brightnesses are most interesting. (Right now doing differential completeness 3 pairs in 15 nights)
+Should double check which brightnesses are most interesting. (Right now doing differential completeness 3 pairs in 15 nights). 
 
 
 
@@ -116,7 +137,7 @@ Melissa Graham has done some work on this. John Franklin has some potentially us
 
 ### Strongly Lensed SNe Ia ###
 
-Working with Simon Huber et al.  This is in MAF, have updated to include dust. Just need to make sure it's still reasonable.
+Working with Simon Huber et al.  This is in MAF, have updated to include dust. Just need to make sure it's still reasonable. 
 
 https://github.com/lsst/sims_maf/blob/master/python/lsst/sims/maf/metrics/snSLMetric.py
 

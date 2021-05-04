@@ -43,18 +43,63 @@ Blaineau et al:  Microlensing towards MCs.  Sounds like they want very long base
 
 Graham et al:  SNe. Lots of text. Claims they like rolling cadence. Not sure there's much in here that matters.
 
+Graham et al: Photo-z note.  They grab median coadded depth in low extinction WFD area. Pass that to a CMNN estimator. Ah, deeper things were worse because they incuded fainter and higher z things. A PZ metric for maf still in the works. Could set the grid points to be the range of depths we want to probe I suppose. We could even just compute the depths ahead of time, then find the N 6-D points that cover the volume the best. There should be some correlations, like when the footprint gets bigger, all filters get fainter. Does look much improved.
 
+Ferguson et al:  Galaxies. What do they mean "full depth" of one DDF? Is that even possible? Want to add the Virgo cluster, at dec+13, that's a good idea.
 
+Hundertmark et al:  Galactic Plane transients.  Microlensing stuff.  Looks similar to a plot in another note? They do really like 6-stripe and bulge roll. Note again that this is very correlated. They have a notebook, so it would be nice to grab these metrics.
+
+Street et al:  Survey footprint for galactic plane and MCs.  They really want all WFD in the southern sky. So there are a bunch of maps. There is a list of star forming regions and globulars. I guess we could try and use that to help make a metric. 
+
+Frohmaier et al: 4MOST doing spectroscopic followup.  They do some SNe Ia simulations, seeing when 4MOST can get spectra, so they want the object classified early enough. Really hate the same filter sim. 
+
+Cuillandre et al:  They like the better dithering on the euclid DDF. I think they are advocating for the northern stripe so we can chase ToOs to any dec?  
+
+Yu et al:  DCR.  OK, they come out and say we don't need to worry too much about DCR. Could double check to make sure we have their latest metric in MAF.
+
+Bellm et al: They use TgapsMetric. There does sound like a case to be made for 2-14 hour gaps. They claim little improvement with the third_obs, but they don't plot them. 
+
+Lochner et al:  DESC cadence note.  They want a replication of altSched (ugh, unhelpful guys). They like small dithers in the DDFs. Should make sure we can replicate that one.
+
+Kovacevic et al:  AGN variability observables. They submitted a paper on this, cool. Looks nifty, lots of math. Not sure I understand their plots.
+
+Moniez et al:  interstellar scintillation with high frequency LMC/SMC:  This is just a pitch to use LSST in movie mode for a few night on the LMC and SMC. That would be cool, but not really survey optimization. Do this in a night of commissioning.
+
+Anguita et al:  Strong Lensing:  They want good seeing in g. Not sure there are any metric in here--but maybe a case to again incorporate the runs that try to get good seeing images in some filters every year.
+
+Gizis et al:  Brown Dwarf astrometry.  Love these metrics (because I wrote them).  This could be a nice metric for helping with deciding filter balance. Need something to push blue now.
+
+D'Orazio et al: Double AGN. Sounds like similar enough to SNe that we can just use that as a proxie?
+
+Li et al:  Anomaly detection:  I love radar plots. 
+
+Androni et al:  Kilanovae. They have a ZTFReST discovery algo. Is this in contrib--ah, it's hung up on a PR. 
+
+Buckley et al: CVs. Very cool looking metric outputs!
+
+Yu et al:  Non-parametric strcture function for AGN.  Looks like it'll work for the DDFs and main survey.
 
 ## Metrics we should try to get
 
 * The number of young stars in thin disk from Prisinzano et al. I helped with this one, so should be easy to find. Looks like they updated with 3d dust! 
-
 * distance to red clump giants and RR Lyrae from Clarkson et al.
-
 * AGN reverberation mapping recovery from Brandt et al.
+* Graham's new photo-z stuff
+* Is there a good euclid overlap metric to be had?
+* Some sort of Virgo Cluster metric
+* Microlensing metrics from Hundertmark et al.
+* maybe a Tgaps where we check the 2-14 hour pair area.
+* Make sure we can do the number of SNe metric for DDFs the right way.
+* At least some of the AGN structure function stuff
+* Brown Dwarf volume metric
+* the KNe metrics from Androni et al--currently on a PR.
+* Need to get the CV metric from Buckley et al.
+
+
 
 ## New runs to try out:
 
-* Even more presto color type sims
+* Even more presto color type sims. Want pairs in the 2-14 hour gap range.
 * DDF with acourdian and rolling styles.
+* Add Virgo Cluster to the footprint maker? Only 8 degrees across. 
+
