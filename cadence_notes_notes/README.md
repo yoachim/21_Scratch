@@ -79,6 +79,8 @@ Buckley et al: CVs. Very cool looking metric outputs!
 
 Yu et al:  Non-parametric strcture function for AGN.  Looks like it'll work for the DDFs and main survey.
 
+Hernitschek et al:  RR Lyrae stars. Looks like they have a good metric we should grab.
+
 ## Metrics we should try to get
 
 * The number of young stars in thin disk from Prisinzano et al. I helped with this one, so should be easy to find. Looks like they updated with 3d dust! 
@@ -94,6 +96,7 @@ Yu et al:  Non-parametric strcture function for AGN.  Looks like it'll work for 
 * Brown Dwarf volume metric
 * the KNe metrics from Androni et al--currently on a PR.
 * Need to get the CV metric from Buckley et al.
+* RR Lyrae stars from Hernitschek
 
 
 
