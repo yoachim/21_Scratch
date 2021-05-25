@@ -260,7 +260,7 @@ Here are a list of simulations we should consider running as part of 2.0 to help
 A new baseline survey with new changes of
 
 * Pairs in twilight
-* New footprint?
+* New footprint? -- update so bulge is a circle rather than box selection.
 
 maybe also a run with the old footprint, and the old footprint/old style.
 
@@ -272,4 +272,8 @@ Could try rolling for both WFD and DDFs.
 
 ## DDFs
 
+Could try adding a calibration field near the south pole. Just do it at the start of morning twilight. Survey object for each filter. (but make sure connected to WFD, don't want it floating on it's own.)
 
+## footprints
+
+Could try chopping off the SCP (maybe with the )
