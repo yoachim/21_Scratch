@@ -9,7 +9,7 @@ Here's a list of metrics
 
 ## Science Metrics being run currently ##
 
-ExgalM5_with_cuts : This is a DESC metric that looks at the coadded depth in i-band for unextincted area in years 1, 3, 6, and 10. I'm not a huge fan of this one since the dust cut is a magic number, but DESC like it. This outputs a 3x2pt FoM and Effective Area summary stats. Since this is i-band only, should not be used when trying to determine filter distributions on survey footprint!
+ExgalM5_with_cuts : This is a DESC metric that looks at the coadded depth in i-band for unextincted area in years 1, 3, 6, and 10. I'm not a huge fan of this one since the dust cut is a magic number, but DESC like it. This outputs a 3x2pt FoM and Effective Area summary stats. Since this is i-band only, should not be used when trying to determine filter distributions on survey footprint! Ugh, and there's an extra hidden arbitrary magnitude cut, this metric has got to go.
 
 DepthLimitedNumGalaxies : A DESC LSS metric. Returns the number of galaxies in i-band for unextincted area. Again, should not be used when trying to determine filter distributions on survey footprint!
 
@@ -276,4 +276,4 @@ Could try adding a calibration field near the south pole. Just do it at the star
 
 ## footprints
 
-Could try chopping off the SCP (maybe with the )
+Could try chopping off the SCP, no one seems to have a metric that wants it.
