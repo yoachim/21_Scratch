@@ -261,6 +261,9 @@ A new baseline survey with new changes of
 
 * Pairs in twilight
 * New footprint? -- update so bulge is a circle rather than box selection.
+* pairs spaced by 33 min
+* u-band is 1x30s
+
 
 maybe also a run with the old footprint, and the old footprint/old style.
 
