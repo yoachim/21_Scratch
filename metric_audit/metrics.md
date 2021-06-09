@@ -264,8 +264,13 @@ A new baseline survey with new changes of
 * pairs spaced by 33 min
 * u-band is 1x30s
 
+maybe also a run with the old footprint, and the old footprint/old style, so folks can say if there is any major losses from the old baseline style.
 
-maybe also a run with the old footprint, and the old footprint/old style.
+## u-band
+1x50s with same number of visits
+1x50 with fewer visits.
+
+##
 
 
 ## Rolling
