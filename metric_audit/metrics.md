@@ -137,7 +137,7 @@ Melissa Graham has done some work on this. John Franklin has some potentially us
 
 ### Strongly Lensed SNe Ia ###
 
-Working with Simon Huber et al.  This is in MAF, have updated to include dust. Just need to make sure it's still reasonable. 
+Working with Simon Huber et al.  This is in MAF, have updated to include dust. Just need to make sure it's still reasonable. OK--now we have dust. Had to update to run it per season rather than average all seasons together. Need to check that is still legit.
 
 https://github.com/lsst/sims_maf/blob/master/python/lsst/sims/maf/metrics/snSLMetric.py
 
