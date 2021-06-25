@@ -263,6 +263,14 @@ A new baseline survey with new changes of
 * New footprint? -- update so bulge is a circle rather than box selection.
 * pairs spaced by 33 min
 * u-band is 1x30s
+* Probably put more weight on the footprint.
+
+
+Baseline-like variations:
+ 
+* 1-snap for all visits
+* baseline-like, but classic footprint
+* classic-style baseline and classic footprint. 
 
 maybe also a run with the old footprint, and the old footprint/old style, so folks can say if there is any major losses from the old baseline style.
 
@@ -276,6 +284,11 @@ maybe also a run with the old footprint, and the old footprint/old style, so fol
 ## Rolling
 
 Could try rolling for both WFD and DDFs. 
+
+## Big planets
+
+* Turn off the mask around Jupyter
+* no mask around any bright planets
 
 
 ## DDFs
