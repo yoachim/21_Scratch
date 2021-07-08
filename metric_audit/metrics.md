@@ -298,3 +298,69 @@ Could try adding a calibration field near the south pole. Just do it at the star
 ## footprints
 
 Could try chopping off the SCP, no one seems to have a metric that wants it.
+
+
+---------------------
+
+From google doc before edits:
+New Baseline:
+U band as 1x30, all other filters 2x15s
+Non-twilight, take pairs aiming for 33 min separation
+Twilight time, pairs with 15 min separation
+New baseline footprint.  
+Extragalactic WFD with extended Dec limits and dust extinction (let’s set the dec limits to give the extragalactic WFD area about 17000 sq deg). Standard current filter balance. 2-band rolling cadence in extragalactic WFD. Smooth dust limits /edges.
+GP coverage - bulge rectangle (with expanded area) and the entire remainder of the plane as defined within latitude cuts - including through the SCP. No bridge. Add LMC/SMC. Use filter balance requested by TVS/SLWMV (need to check on this). Cover bulge at 825 visits per pointing level, and remainder at ~300 visits/pp level (check). Cut off GP at max dec of extragalactic WFD.
+NES coverage on the order of 400-450 visits pp, griz. 
+Cover remainder of SCP not within GP footprint at 6x10x4 = 240 visits pp. 
+5 DD pointings (4 previous fields plus euclid - add links)
+Probably update the footprint basis function weight to be a bit stronger
+
+
+Retro:
+A few runs to make it easier to throw away previous sims and make sure we didn’t break anything with the new baseline.
+Retro footprint:  Same as new baseline, but use our classic retro footprint. (?)
+Retro classic: retro footprint and v1.7 settings  (what’s the difference with v1.7 settings? vs. v1.7.1 or v1.5?)
+
+Rolling:
+In theory, rolling in the WFD and GP can be done independently. So we can run a variety of rolling and then see if we need to split them apart.
+2, 3, and 6 band rolling 
+I think the extragalactic WFD is going to need to be 2-band rolling. We should do 2-band in the baseline and non-rolling in an option. 
+6-band rolling in the GP bridge is very interesting. 
+Maybe 2 rolling strengths? 50% and 90%?
+
+Longer u:
+Set u to 1x50s, same relative number of visits
+Set u to 1x50s, decrease number of visits to be similar amount of total time in u. 
+
+NES sweep:
+We should do a sweep of NES strength on the footprint (from 200 visits per pointing to 500 visits per pointing ), just to see how that changes solar system metrics. We could even vary the filter distribution too. g=0, .1,.2,.4 r=0, .23, 0.46, 0.8, 1 i=0, 0.23, 0.46, 0.8, 1, z=0,0.2, 0.4, 0.6, 0.9. Don’t vary filters now, ~3 sims varying strength. 
+
+GP sweep: 
+Vary GP low-priority region strength (from 160-300? Visits per pointing) to look at effect on GP metrics. 2 simulations.
+
+Presto Color:
+Add observations so there are observations at 90-120 min interval. Vary the amount of survey time dedicated to observing triplets. 
+One simulation with all-sky presto color in the first year
+Two-three simulations with some fraction of the sky in presto-color the whole time (10%, 20%, 30%? We can run more sims to decide what looks practical)
+XXX--is that interval from the first in the pair, or the second? (the second I think)
+XXX--do we want to include their desire to have broader filter spacing? Let’s try it with both - wider filter spacing and our standard filter spacing. These are specialized simulations to answer this very specific question, and worth trying both.
+
+Long Gaps:
+Try to get some observations in the 2-14 hour range. Vary the amount of time dedicated to trying to get long gaps.
+After 5 years, vary the time spacing between pairs (how do we decide the spacing?)
+
+Deep Drilling:
+Oof. I made a good start at revamping the DDF scheduling, but it needs some more concerted effort. And, as always, we need some DDF specific metrics. Maybe the rigorous DDF upgrade waits for v2.1, and here we could do something like vary the DDF fraction of time (say, 2, 5, 7, 10% of visits for DDFs)?
+maybe let’s vary 5% and 8% .. I doubt 10% will be viable, but 7% might not be super noticeable .. 8% seems like a split between these two. 2% seems like too little, given that the cadence is already on the low end for these DD fields.
+Given the problem with updating the DDF scheduling - does that mean we can’t do rolling DD fields now? (this would be the hot ticket I suspect .. concentrated cadence in one year, lower cadence the next, etc.)
+Goal: make people make DD metrics
+
+Micro surveys: 
+see Jay’s email for reference — this seems likely to add ~13? additional simulations (the trailed star visits is not one I would simulate at this time .. I don’t know how to do this within the current scheduler, to be honest — does this indicate a missing functionality? or is it just a problem with our current simulation framework?) .. plus one where we do all of the microsurveys, so 14 total. 
+Arbitrarily define ToOs at 2% of time
+We should add a simulation where we add some % of time as DD (there should obviously be some DD time .. which could be simulated as essentially blank blocks — how long? a preferential time of night? what fraction? 
+Given that often the microsurveys are pushed into “well, this could be done in DD time”, it seems that it’s assumed DD time exists. I don’t know its definition, but perhaps some simulations would help put this into the right ballpark. 
+
+
+
+
