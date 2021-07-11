@@ -4,6 +4,7 @@ import sqlite3
 from rubin_sim.scheduler.modelObservatory import Model_observatory
 from rubin_sim.scheduler.utils import empty_observation, run_info_table, schema_converter
 import sys
+from astropy.time import Time
 
 
 
@@ -37,16 +38,21 @@ def update_minion(outfile='minion_1016_update.db'):
     obs_good = np.zeros(num_obs, dtype=bool)
 
     for i, obs in enumerate(observations):
-        mo.mjd = obs['mjd']
 
-        observations[i] = mo.observation_add_data(obs)
+        obs_good[i] = True #mo.check_up(obs['mjd'])
+        clouds = mo.cloud_data(Time(obs['mjd'], format='mjd'))
+        if clouds > mo.cloud_limit:
+            obs_good[i] = False
 
-        progress = i/num_obs*100
-        text = "\rprogress=%.3f%%, %i of %i" % (progress, i, num_obs)
-        sys.stdout.write(text)
-        sys.stdout.flush()
+        if obs_good[i]:
+            mo.mjd = obs['mjd']
 
-        obs_good[i] = mo.check_mjd(mo.mjd)
+            observations[i] = mo.observation_add_data(obs)
+
+            progress = i/num_obs*100
+            text = "\rprogress=%.3f%%, %i of %i" % (progress, i, num_obs)
+            sys.stdout.write(text)
+            sys.stdout.flush()
         
     
     observations = observations[np.where(obs_good == True)[0]]
