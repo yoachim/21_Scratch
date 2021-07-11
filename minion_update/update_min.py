@@ -12,40 +12,44 @@ def update_minion(outfile='minion_1016_update.db'):
     """
 
     conn = sqlite3.connect('minion_1016_sqlite.db')
-    query = 'select fieldRA, fieldDec, filter, expMJD, night, visitExpTime, airmass, rotSkyPos, rotTelPos, altitude, azimuth, slewTime from Summary group by expMJD'
+    query = 'select fieldRA, fieldDec, filter, expMJD, night, visitExpTime, visitTime, airmass, rotSkyPos, rotTelPos, altitude, azimuth, slewTime from Summary group by expMJD order by expMJD'
     df = pd.read_sql(query, conn)
 
-    num_obs = df.size
+    num_obs = df['fieldRA'].size
 
     mo = Model_observatory(mjd_start=df['expMJD'].min())
-    obs_list = []
+    blank = empty_observation()
 
-    for index, line in df.iterrows():
-        obs = empty_observation()
-        obs['RA'] = line['fieldRA']
-        obs['dec'] = line['fieldDec']
-        obs['filter'] = line['filter']
-        obs['exptime'] = line['visitExpTime']
-        obs['nexp'] = 2
-        obs['slewtime'] = line['slewTime']
-        obs['alt'] = line['altitude']
-        obs['rotSkyPos'] = line['rotSkyPos']
-        obs['rotTelPos'] = line['rotTelPos']
+    observations = np.zeros(num_obs, dtype=blank.dtype)
+    observations['RA'] = df['fieldRA']
+    observations['dec'] = df['fieldDec']
+    observations['mjd'] = df['expMJD']
+    observations['filter'] = df['filter']
+    observations['exptime'] = df['visitExpTime']
+    observations['nexp'] = 2
+    observations['slewtime'] = df['slewTime']
+    observations['alt'] = df['altitude']
+    observations['az'] = df['azimuth']
+    observations['rotSkyPos'] = df['rotSkyPos']
+    observations['rotTelPos'] = df['rotTelPos']
+    observations['visittime'] = df['visitTime']
 
-        mo.mjd = line['expMJD']
+    obs_good = np.zeros(num_obs, dtype=bool)
 
+    for i, obs in enumerate(observations):
+        mo.mjd = obs['mjd']
 
-        progress = index/num_obs*100
-        text = "\rprogress=%.3f%%" % progress
+        observations[i] = mo.observation_add_data(obs)
+
+        progress = i/num_obs*100
+        text = "\rprogress=%.3f%%, %i of %i" % (progress, i, num_obs)
         sys.stdout.write(text)
         sys.stdout.flush()
 
-        if mo.check_mjd(mo.mjd):
-            obs = mo.observation_add_data(obs)
-            obs_list.append(obs)
+        obs_good[i] = mo.check_mjd(mo.mjd)
         
-            
-    observations = np.array(obs_list)[:, 0]
+    
+    observations = observations[np.where(obs_good == True)[0]]
     if outfile is not None:
         info = run_info_table(mo)
         converter = schema_converter()
