@@ -24,8 +24,6 @@ if __name__ == "__main__":
 
     mjds = np.arange(mjd0, mjd0+survey_length, delta_t)
 
-    mjds=mjds[0:20]
-
     names = ['mjd', 'sun_alt']
     for survey in dds:
         names.append(survey.survey_name+'_airmass')
