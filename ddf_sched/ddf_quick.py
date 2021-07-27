@@ -2,6 +2,9 @@ import numpy as np
 from astropy.time import Time
 from rubin_sim.site_models import (ScheduledDowntimeData, UnscheduledDowntimeData,
                                    SeeingData, SeeingModel, CloudData, Almanac)
+from rubin_sim.utils import Site, m5_flat_sed
+import astropy.units as u
+from astropy.coordinates import SkyCoord, AltAz, EarthLocation
 
 
 class Fast_ddf_sim(object):
@@ -26,8 +29,12 @@ class Fast_ddf_sim(object):
         self.almanac = Almanac(mjd_start=mjd_start)
 
         mjd_start_time = Time(mjd_start, format='mjd')
+
+        # Create an astropy location
+        self.site = Site('LSST')
+        self.location = EarthLocation(lat=self.site.latitude, lon=self.site.longitude,
+                                      height=self.site.height)
         # Downtime
-        down_nights = []
         sched_downtime_data = ScheduledDowntimeData(mjd_start_time)
         unsched_downtime_data = UnscheduledDowntimeData(mjd_start_time)
 
@@ -61,11 +68,11 @@ class Fast_ddf_sim(object):
             diff = downtimes['start'][1:] - downtimes['end'][0:-1]
         self.downtimes = downtimes
 
-        seeing_data = SeeingData(mjd_start_time, seeing_db=None)
-        seeing_model = SeeingModel()
-        seeing_indx_dict = {}
-        for i, filtername in enumerate(seeing_model.filter_list):
-            seeing_indx_dict[filtername] = i
+        self.seeing_data = SeeingData(mjd_start_time, seeing_db=None)
+        self.seeing_model = SeeingModel()
+        self.seeing_indx_dict = {}
+        for i, filtername in enumerate(self.seeing_model.filter_list):
+            self.seeing_indx_dict[filtername] = i
 
         self.cloud_data = CloudData(mjd_start_time, offset_year=0)
 
@@ -117,35 +124,37 @@ class Fast_ddf_sim(object):
         for filtername in filternames:
             for ddf_name in ddf_names:
                 in_filt = np.where((observations['filter'] == filtername) & (observations['note'] == ddf_name))
-                observations['skybrightness'][in_filt] = np.interp(observations['mjd'],
+                observations['skybrightness'][in_filt] = np.interp(observations['mjd'][in_filt],
                                                                    self.data_blob['ddf_grid']['mjd'],
                                                                    self.data_blob['ddf_grid'][ddf_name+'_sky_'+filtername])
 
+        # RA, dec, mjd to altaz
+        sc = SkyCoord(observations['RA']*u.rad, observations['dec']*u.rad)
+        times = Time(observations['mjd'], format='mjd')
+        aa = AltAz(location=self.location, obstime=times)
+        temp_coords = sc.transform_to(aa)
+        observations['alt'] = temp_coords.alt.rad
+        observations['az'] = temp_coords.az.rad
+        observations['airmass'] = 1./np.cos(np.pi/2. - observations['alt'])
 
         # seeing values
         for filtername in filternames:
             in_filt = np.where(observations['filter'] == filtername)
-            FWHM_500 = self.seeing_data(observations['mjd'][in_filt])
+            FWHM_500 = self.seeing_data(Time(observations['mjd'][in_filt], format='mjd'))
             observations['FWHM_500'][in_filt] = FWHM_500
-            seeing_dict = self.seeing_model(FWHM_500, observations['airmass'])
-            observations['FWHMeff'][in_filt] = seeing_dict['fwhmEff'][filtername]
-            observations['FWHM_geometric'][in_filt] = seeing_dict['fwhmGeom'][filtername]
+            seeing_dict = self.seeing_model(FWHM_500, observations['airmass'][in_filt])
+            observations['FWHMeff'][in_filt] = seeing_dict['fwhmEff'][self.seeing_indx_dict[filtername]]
+            observations['FWHM_geometric'][in_filt] = seeing_dict['fwhmGeom'][self.seeing_indx_dict[filtername]]
 
+            observations['fivesigmadepth'][in_filt] = m5_flat_sed(filtername, observations['skybrightness'][in_filt],
+                                                                  observations['FWHMeff'][in_filt],
+                                                                  observations['exptime'][in_filt]/observations['nexp'][in_filt],
+                                                                  observations['airmass'][in_filt],
+                                                                  nexp=np.max(observations['nexp']))
 
-        # Alt, az, airmass, LMST, pa, rotTelPos, rotSkyPos
+        # Fill in the actual night
+        indx = self.almanac.mjd_indx(observations['mjd'])
+        observations['night'] = self.almanac.sunsets['night'][indx]
+        
 
-        # sky brightness from each filter and each position
-
-        # m5 values
-
-        # Clouds
-
-        # night
-
-        # obs ID
-
-        # Maybe add in the sun,moon,solar elongation stuff.
-
-        pass
-
-
+        return observations
