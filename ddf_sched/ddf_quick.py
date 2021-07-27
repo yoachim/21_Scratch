@@ -11,12 +11,19 @@ class Fast_ddf_sim(object):
     ----------
     delta_t_min : float (36)
         The minimum time required between observations (seconds)
+    pre_computed_blob : dict-like
+        The data blob that has all the sky brightness and airmass values pre-computed
     """
-    def __init__(self, delta_t_min=36., mjd_start=60218., cloud_limit=0.3, filter_change_time=120.):
+    def __init__(self, delta_t_min=36., mjd_start=60218., cloud_limit=0.3, filter_change_time=120.,
+                 pre_computed_blob=None):
 
         self.cloud_limit = cloud_limit
         self.delta_t_min = delta_t_min/3600./24.  # to days
         self.filter_change_time = filter_change_time/3600./24.
+
+        self.data_blob = pre_computed_blob
+
+        self.almanac = Almanac(mjd_start=mjd_start)
 
         mjd_start_time = Time(mjd_start, format='mjd')
         # Downtime
@@ -62,12 +69,14 @@ class Fast_ddf_sim(object):
 
         self.cloud_data = CloudData(mjd_start_time, offset_year=0)
 
-    def check_observations(self, observations_in):
+    def observe(self, observations_in):
         observations_out = observations_in.copy()
 
         observations_out = self.space_observations(observations_out)
         observations_out = self.remove_downtimes(observations_out)
         observations_out = self.remove_cloudy(self.observations_out)
+
+        observations_out = self.add_details(observations_out)
 
         return observations_out
 
@@ -102,11 +111,30 @@ class Fast_ddf_sim(object):
         """Add in the rest of the relevant details for the observations
         """
 
+        filternames = np.unique(observations['filter'])
+        ddf_names = np.unique(observations['note'])
+
+        for filtername in filternames:
+            for ddf_name in ddf_names:
+                in_filt = np.where((observations['filter'] == filtername) & (observations['note'] == ddf_name))
+                observations['skybrightness'][in_filt] = np.interp(observations['mjd'],
+                                                                   self.data_blob['ddf_grid']['mjd'],
+                                                                   self.data_blob['ddf_grid'][ddf_name+'_sky_'+filtername])
+
+
+        # seeing values
+        for filtername in filternames:
+            in_filt = np.where(observations['filter'] == filtername)
+            FWHM_500 = self.seeing_data(observations['mjd'][in_filt])
+            observations['FWHM_500'][in_filt] = FWHM_500
+            seeing_dict = self.seeing_model(FWHM_500, observations['airmass'])
+            observations['FWHMeff'][in_filt] = seeing_dict['fwhmEff'][filtername]
+            observations['FWHM_geometric'][in_filt] = seeing_dict['fwhmGeom'][filtername]
+
+
         # Alt, az, airmass, LMST, pa, rotTelPos, rotSkyPos
 
         # sky brightness from each filter and each position
-
-        # seeing values
 
         # m5 values
 
