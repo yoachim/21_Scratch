@@ -81,7 +81,7 @@ class Fast_ddf_sim(object):
 
         observations_out = self.space_observations(observations_out)
         observations_out = self.remove_downtimes(observations_out)
-        observations_out = self.remove_cloudy(self.observations_out)
+        observations_out = self.remove_cloudy(observations_out)
 
         observations_out = self.add_details(observations_out)
 
@@ -155,6 +155,6 @@ class Fast_ddf_sim(object):
         # Fill in the actual night
         indx = self.almanac.mjd_indx(observations['mjd'])
         observations['night'] = self.almanac.sunsets['night'][indx]
-        
+
 
         return observations
