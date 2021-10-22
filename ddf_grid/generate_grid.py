@@ -1,15 +1,15 @@
 import numpy as np
 import healpy as hp
-from lsst.sims.featureScheduler.surveys import generate_dd_surveys
-import lsst.sims.skybrightness as sb
-from lsst.sims.utils import m5_flat_sed
-from lsst.sims.seeingModel import SeeingModel
+from rubin_sim.utils import ddf_locations
+import rubin_sim.skybrightness as sb
+from rubin_sim.utils import m5_flat_sed
+from rubin_sim.site_models.seeingModel import SeeingModel
 import sys
 
 if __name__ == "__main__":
 
-    dds = generate_dd_surveys()
-    mjd0 = 59853.5
+    dds = ddf_locations()
+    mjd0 = 60218.
     delta_t = 15./60./24.  # to days
     survey_length = 10.*365.25
     sun_limit = np.radians(-12.)  # degrees
@@ -18,33 +18,27 @@ if __name__ == "__main__":
 
     filtername = 'g'
 
-
     seeing_model = SeeingModel()
 
-    seeing_indx = 1 #np.where(seeing_model.filter_list == filtername)[0]
-
-    # result
+    seeing_indx = 1
 
     mjds = np.arange(mjd0, mjd0+survey_length, delta_t)
 
-    # XXX Temp
-    #mjds = mjds[0:100]
-
     names = ['mjd', 'sun_alt']
-    for survey in dds:
-        names.append(survey.survey_name+'_airmass')
-        names.append(survey.survey_name+'_sky_g')
-        names.append(survey.survey_name+'_m5_g')
+    for survey_name in dds.keys():
+        names.append(survey_name+'_airmass')
+        names.append(survey_name+'_sky_g')
+        names.append(survey_name+'_m5_g')
 
     types = [float]*len(names)
     result = np.zeros(mjds.size, dtype=list(zip(names, types)))
     result['mjd'] = mjds
 
     # pretty sure these are radians
-    ras = np.array([survey.ra for survey in dds])
-    decs = np.array([survey.dec for survey in dds])
+    ras = np.radians(np.array([dds[survey][0] for survey in dds]))
+    decs = np.radians(np.array([dds[survey][1] for survey in dds]))
 
-    sm = sb.SkyModel(observatory='LSST', mags=True)
+    sm = sb.SkyModel(mags=True)
     mags = []
     airmasses = []
     sun_alts = []
@@ -68,13 +62,14 @@ if __name__ == "__main__":
     mags = np.array(mags)
     airmasses = np.array(airmasses)
     result['sun_alt'] = sun_alts
-    for i, survey in enumerate(dds):
-        result[survey.survey_name+'_airmass'] = airmasses[:, i]
-        result[survey.survey_name+'_sky_g'] = mags[:, i]
+    for i, survey_name in enumerate(dds.keys()):
+        result[survey_name+'_airmass'] = airmasses[:, i]
+        result[survey_name+'_sky_g'] = mags[:, i]
 
         # now to compute the expected seeing if the zenith is nominal
         FWHMeff = seeing_model(nominal_seeing, airmasses[:, i])['fwhmEff'][seeing_indx, :]
-        result[survey.survey_name+'_m5_g'] = m5_flat_sed('g', mags[:, i], FWHMeff, 30., airmasses[:, i], nexp=1)
+        result[survey_name+'_m5_g'] = m5_flat_sed('g', mags[:, i], FWHMeff, 30.,
+                                                  airmasses[:, i], nexp=1)
 
 
     np.savez('ddf_grid.npz', ddf_grid=result)
