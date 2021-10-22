@@ -1,11 +1,37 @@
 import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
-import scipy.sparse as sp
-from scipy.stats import binned_statistic
-import matplotlib.pylab as plt
 from rubin_sim.utils import ddf_locations
-from rubin_sim.utils import calcSeason
+#from rubin_sim.utils import calcSeason
+
+
+def calcSeason(ra, time):
+    """Calculate the 'season' in the survey for a series of ra/dec/time values of an observation.
+    Based only on the RA of the point on the sky, it calculates the 'season' based on when this
+    point would be overhead .. the season is considered +/- 0.5 years around this time.
+
+    Parameters
+    ----------
+    ra : float
+        The RA (in degrees) of the point on the sky
+    time : np.ndarray
+        The times of the observations, in MJD
+
+    Returns
+    -------
+    np.ndarray
+        The season values
+    """
+    # Reference RA and equinox to anchor ra/season reference - RA = 0 is overhead at autumnal equinox
+    # autumn equinox 2014 happened on september 23 --> equinox MJD
+    Equinox = 2456923.5 - 2400000.5
+    # convert ra into 'days'
+    dayRA = ra / 360 * 365.25
+    firstSeasonBegan = Equinox + dayRA - 0.5 * 365.25
+    seasons = (time - firstSeasonBegan) / 365.25
+    # Set first season to 0
+    seasons = seasons - np.floor(np.min(seasons))
+    return seasons
 
 
 def sched_ddf(ddf_name, sun_limit=-18., airmass_limit=2.1, sky_limit=22.,
@@ -46,6 +72,10 @@ def sched_ddf(ddf_name, sun_limit=-18., airmass_limit=2.1, sky_limit=22.,
     m.addConstr(schedule @ airmass_mask == 0)
     m.addConstr(schedule @ sky_mask == 0)
 
+    # limit the total number of ddf sequences
+    # HA! Need to set an exact number I think. Or maybe a range.
+    m.addConstr(schedule.sum() == n_wanted)
+
     # prevent a repeat sequence in a night
     unights, indx = np.unique(night, return_index=True)
     night_mjd = ddf_grid['mjd'][indx]
@@ -57,6 +87,19 @@ def sched_ddf(ddf_name, sun_limit=-18., airmass_limit=2.1, sky_limit=22.,
         m.addConstr(schedule[in_night]@schedule[in_night] <= 1)
         m.addConstr(sched_night[i] == schedule[in_night].sum())
 
+    raw_obs = np.ones(unights.size)
+    # take out the ones that are out of season
+    season_mod = night_season % 1
+    # 7.2 month observing season if season_frac = 0.2
+    season_frac = 0.2
+    out_season = np.where((season_mod < season_frac) | (season_mod > (1.-season_frac)))
+    raw_obs[out_season] = 0
+    cumulative_desired = np.cumsum(raw_obs)
+    cumulative_desired = cumulative_desired/cumulative_desired.max()*n_wanted
+
+    # Makes it go blazing fast agian, that's for sure!
+    cumulative_desired = np.round(cumulative_desired)
+
     # Cumulative number of scheduled events (by night, to avoid huge loop)
     cumulative_sched = m.addMVar(unights.size, vtype=GRB.INTEGER)
     cumulative_diff = m.addMVar(unights.size, vtype=GRB.INTEGER,
@@ -64,17 +107,8 @@ def sched_ddf(ddf_name, sun_limit=-18., airmass_limit=2.1, sky_limit=22.,
 
     m.addConstr(cumulative_sched[0] == sched_night[0])
 
-    raw_obs = np.ones(unights.size)
-    # take out the ones that are out of season
-    season_mod = night_season % 1
-    # 7.2 month observing season if season_frac = 0.2
-    out_season = np.where((season_mod < season_frac) | (season_mod > (1.-season_frac)))
-    raw_obs[out_season] = 0
-    cumulative_desired = np.cumsum(raw_obs)
-    # XXX--so this is where we can change things around a lot. Can eliminate 
-    # partial seasons, or make some rolling. 
-    cumulative_desired = cumulative_desired/cumulative_desired.max()*n_wanted
 
+    import pdb ; pdb.set_trace()
     # Makes it go blazing fast agian, that's for sure!
     cumulative_desired = np.round(cumulative_desired)
 
