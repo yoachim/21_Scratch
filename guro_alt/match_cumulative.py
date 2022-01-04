@@ -17,7 +17,7 @@ def match_cumulative(cumulative_desired, mask=None, no_duplicate=True):
     Returns
     -------
     schedule : `np.array`
-        The resulting schedule, with 1 marking events
+        The resulting schedule, with values marking number of events in that cell.
     """
 
     rounded_desired = np.round(cumulative_desired)
@@ -32,6 +32,8 @@ def match_cumulative(cumulative_desired, mask=None, no_duplicate=True):
     step_points = np.where(drd > 0)[0] + 1
 
     # would be nice to eliminate this loop, but it's not too bad.
+    # can't just use searchsorted on the whole array, because then there
+    # can be duplicate values, and array[[n,n]] = 1 means that extra match gets lost.
     for indx in step_points:
         left = np.searchsorted(x[valid], indx)
         right = np.searchsorted(x[valid], indx, side='right')
@@ -41,6 +43,10 @@ def match_cumulative(cumulative_desired, mask=None, no_duplicate=True):
             sched_at = left
         else:
             sched_at = right
+
+        # If we are off the end
+        if sched_at >= len(valid):
+            sched_at -= 1
 
         sched[valid[sched_at]] += 1
         if no_duplicate:
